@@ -1,15 +1,13 @@
 import { ArrowLeft, Edit, Trash2 } from "lucide-react"
+import { notFound } from "next/navigation"
 import { Button } from "@/app/components/ui/button"
 import { Card, CardContent } from "@/app/components/ui/card"
 import { Progress } from "@/app/components/ui/progress"
 import { Badge } from "@/app/components/ui/badge"
 import { Separator } from "@/app/components/ui/separator"
-import { MealImagePlaceholder } from "@/app/components/MealImagePlaceholder"
+import { MealImage } from "@/app/components/MealImage"
+import { getMealById } from "@/app/lib/meals-data"
 import Link from "next/link"
-
-function hasMealPhoto(url: string | null | undefined): boolean {
-  return !!url && !url.includes("placeholder")
-}
 
 export default async function MealDetailPage({
   params,
@@ -17,36 +15,10 @@ export default async function MealDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const meal = {
-    id,
-    time: "昼食 - 12:15",
-    date: "2024年5月9日",
-    name: "鶏むね肉のサラダ",
-    description: "グリルした鶏むね肉とミックスリーフのサラダ、ドレッシングは別添え",
-    calories: 450,
-    protein: 35,
-    fat: 12,
-    carbs: 45,
-    imageUrl: "/placeholder.svg?height=300&width=500",
-    ingredients: [
-      { name: "鶏むね肉", amount: "150g", calories: 165, protein: 31, fat: 3.5, carbs: 0 },
-      { name: "ミックスリーフ", amount: "100g", calories: 25, protein: 2, fat: 0.5, carbs: 5 },
-      { name: "トマト", amount: "80g", calories: 15, protein: 0.5, fat: 0.2, carbs: 3 },
-      { name: "アボカド", amount: "50g", calories: 80, protein: 1, fat: 7.5, carbs: 4 },
-      { name: "オリーブオイル", amount: "小さじ1", calories: 45, protein: 0, fat: 5, carbs: 0 },
-      { name: "バルサミコ酢", amount: "小さじ2", calories: 10, protein: 0, fat: 0, carbs: 2 },
-      { name: "塩こしょう", amount: "少々", calories: 0, protein: 0, fat: 0, carbs: 0 },
-    ],
-    additionalNutrients: [
-      { name: "食物繊維", amount: "5g", percentage: 20 },
-      { name: "ナトリウム", amount: "350mg", percentage: 15 },
-      { name: "カリウム", amount: "550mg", percentage: 28 },
-      { name: "カルシウム", amount: "45mg", percentage: 5 },
-      { name: "鉄分", amount: "2.5mg", percentage: 14 },
-      { name: "ビタミンA", amount: "120μg", percentage: 15 },
-      { name: "ビタミンC", amount: "35mg", percentage: 35 },
-    ],
-    tags: ["高タンパク", "低脂質", "サラダ", "鶏肉"],
+  const meal = getMealById(id)
+
+  if (!meal) {
+    notFound()
   }
 
   const proteinCalories = meal.protein * 4
@@ -77,15 +49,7 @@ export default async function MealDetailPage({
 
         {/* 食事画像 */}
         <div className="relative mb-6 h-56 w-full overflow-hidden rounded-xl bg-[var(--muted)]">
-          {hasMealPhoto(meal.imageUrl) ? (
-            <img
-              src={meal.imageUrl!}
-              alt=""
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <MealImagePlaceholder className="h-full w-full rounded-xl" />
-          )}
+          <MealImage src={meal.imageUrl} className="h-full w-full rounded-xl" />
           <Badge
             variant="secondary"
             className="absolute left-3 top-3 bg-[var(--card)]/90 backdrop-blur-sm"

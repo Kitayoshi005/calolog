@@ -4,14 +4,12 @@ import { Progress } from "@/app/components/ui/progress"
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar"
-import { MealImagePlaceholder } from "@/app/components/MealImagePlaceholder"
+import { MealImage } from "@/app/components/MealImage"
+import { getMeals } from "@/app/lib/meals-data"
 import Link from "next/link"
 
-function hasMealPhoto(url: string | null | undefined): boolean {
-  return !!url && !url.includes("placeholder")
-}
-
 export default function Home() {
+  const meals = getMeals()
   const userData = {
     name: "山田太郎",
     targetCalories: 2200,
@@ -19,48 +17,7 @@ export default function Home() {
     protein: { target: 150, current: 95 },
     fat: { target: 70, current: 45 },
     carbs: { target: 220, current: 180 },
-    meals: [
-      {
-        id: 1,
-        time: "朝食 - 7:30",
-        name: "オートミールとフルーツ",
-        calories: 350,
-        protein: 15,
-        fat: 8,
-        carbs: 55,
-        imageUrl: "/placeholder.svg?height=80&width=80",
-      },
-      {
-        id: 2,
-        time: "昼食 - 12:15",
-        name: "鶏むね肉のサラダ",
-        calories: 450,
-        protein: 35,
-        fat: 12,
-        carbs: 45,
-        imageUrl: "/placeholder.svg?height=80&width=80",
-      },
-      {
-        id: 3,
-        time: "間食 - 15:30",
-        name: "プロテインシェイク",
-        calories: 150,
-        protein: 25,
-        fat: 3,
-        carbs: 5,
-        imageUrl: "/placeholder.svg?height=80&width=80",
-      },
-      {
-        id: 4,
-        time: "夕食 - 19:00",
-        name: "サーモンと野菜炒め",
-        calories: 500,
-        protein: 40,
-        fat: 22,
-        carbs: 35,
-        imageUrl: "/placeholder.svg?height=80&width=80",
-      },
-    ],
+    meals,
   }
 
   const calorieProgress = Math.round((userData.currentCalories / userData.targetCalories) * 100)
@@ -193,15 +150,7 @@ export default function Home() {
                   <Card className="overflow-hidden transition-colors hover:bg-[var(--muted)]/50">
                     <div className="flex">
                       <div className="h-20 w-20 shrink-0 bg-[var(--muted)]">
-                        {hasMealPhoto(meal.imageUrl) ? (
-                          <img
-                            src={meal.imageUrl!}
-                            alt=""
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <MealImagePlaceholder className="h-full w-full" />
-                        )}
+                        <MealImage src={meal.imageUrl} className="h-full w-full" />
                       </div>
                       <div className="flex min-w-0 flex-1 flex-col justify-center px-4 py-3">
                         <p className="text-xs text-[var(--muted-foreground)]">{meal.time}</p>
