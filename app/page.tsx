@@ -1,103 +1,261 @@
-import Image from "next/image";
+import { Plus, Camera, Edit, ChevronRight, Settings } from "lucide-react"
+import { Button } from "@/app/components/ui/button"
+import { Progress } from "@/app/components/ui/progress"
+import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs"
+import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar"
+import { MealImagePlaceholder } from "@/app/components/MealImagePlaceholder"
+import Link from "next/link"
+
+function hasMealPhoto(url: string | null | undefined): boolean {
+  return !!url && !url.includes("placeholder")
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const userData = {
+    name: "山田太郎",
+    targetCalories: 2200,
+    currentCalories: 1450,
+    protein: { target: 150, current: 95 },
+    fat: { target: 70, current: 45 },
+    carbs: { target: 220, current: 180 },
+    meals: [
+      {
+        id: 1,
+        time: "朝食 - 7:30",
+        name: "オートミールとフルーツ",
+        calories: 350,
+        protein: 15,
+        fat: 8,
+        carbs: 55,
+        imageUrl: "/placeholder.svg?height=80&width=80",
+      },
+      {
+        id: 2,
+        time: "昼食 - 12:15",
+        name: "鶏むね肉のサラダ",
+        calories: 450,
+        protein: 35,
+        fat: 12,
+        carbs: 45,
+        imageUrl: "/placeholder.svg?height=80&width=80",
+      },
+      {
+        id: 3,
+        time: "間食 - 15:30",
+        name: "プロテインシェイク",
+        calories: 150,
+        protein: 25,
+        fat: 3,
+        carbs: 5,
+        imageUrl: "/placeholder.svg?height=80&width=80",
+      },
+      {
+        id: 4,
+        time: "夕食 - 19:00",
+        name: "サーモンと野菜炒め",
+        calories: 500,
+        protein: 40,
+        fat: 22,
+        carbs: 35,
+        imageUrl: "/placeholder.svg?height=80&width=80",
+      },
+    ],
+  }
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const calorieProgress = Math.round((userData.currentCalories / userData.targetCalories) * 100)
+  const proteinProgress = Math.round((userData.protein.current / userData.protein.target) * 100)
+  const fatProgress = Math.round((userData.fat.current / userData.fat.target) * 100)
+  const carbsProgress = Math.round((userData.carbs.current / userData.carbs.target) * 100)
+
+  return (
+    <main className="min-h-screen bg-[var(--background)]">
+      <div className="mx-auto max-w-md px-4 pb-24 pt-6">
+        {/* ヘッダー */}
+        <header className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-10 w-10 border-2 border-[var(--border)]">
+              <AvatarImage src="/placeholder.svg" alt="プロフィール" />
+              <AvatarFallback className="text-sm font-medium">YT</AvatarFallback>
+            </Avatar>
+            <div>
+              <h1 className="text-lg font-semibold tracking-tight">{userData.name}</h1>
+              <p className="text-sm text-[var(--muted-foreground)]">2024年5月9日</p>
+            </div>
+          </div>
+          <Button variant="ghost" size="icon" aria-label="設定">
+            <Settings className="h-5 w-5" />
+          </Button>
+        </header>
+
+        {/* カロリーカード */}
+        <Card className="mb-6">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[var(--muted-foreground)]">今日の摂取カロリー</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="text-3xl font-semibold tabular-nums tracking-tight">
+                {userData.currentCalories}
+                <span className="ml-1 text-lg font-normal text-[var(--muted-foreground)]">kcal</span>
+              </span>
+              <span className="text-sm text-[var(--muted-foreground)]">
+                目標 {userData.targetCalories} kcal
+              </span>
+            </div>
+            <Progress value={calorieProgress} className="h-2.5" />
+            <p className="text-right text-sm text-[var(--muted-foreground)]">
+              残り {userData.targetCalories - userData.currentCalories} kcal
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* PFCタブ */}
+        <Tabs defaultValue="nutrition" className="mb-8">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="nutrition">栄養バランス</TabsTrigger>
+            <TabsTrigger value="chart">グラフ</TabsTrigger>
+          </TabsList>
+          <TabsContent value="nutrition" className="mt-4">
+            <Card>
+              <CardContent className="pt-5">
+                <div className="space-y-5">
+                  <div>
+                    <div className="mb-1.5 flex justify-between text-sm">
+                      <span className="font-medium">タンパク質</span>
+                      <span className="text-[var(--muted-foreground)]">
+                        {userData.protein.current}g / {userData.protein.target}g
+                      </span>
+                    </div>
+                    <Progress value={proteinProgress} className="h-2" indicatorColor="bg-emerald-500" />
+                  </div>
+                  <div>
+                    <div className="mb-1.5 flex justify-between text-sm">
+                      <span className="font-medium">脂質</span>
+                      <span className="text-[var(--muted-foreground)]">
+                        {userData.fat.current}g / {userData.fat.target}g
+                      </span>
+                    </div>
+                    <Progress value={fatProgress} className="h-2" indicatorColor="bg-amber-500" />
+                  </div>
+                  <div>
+                    <div className="mb-1.5 flex justify-between text-sm">
+                      <span className="font-medium">炭水化物</span>
+                      <span className="text-[var(--muted-foreground)]">
+                        {userData.carbs.current}g / {userData.carbs.target}g
+                      </span>
+                    </div>
+                    <Progress value={carbsProgress} className="h-2" indicatorColor="bg-sky-500" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="chart" className="mt-4">
+            <Card>
+              <CardContent className="flex justify-center py-8">
+                <div className="relative flex h-44 w-44 items-center justify-center">
+                  <div className="absolute inset-0 rounded-full border-[10px] border-[var(--muted)]" />
+                  <div className="text-center">
+                    <div className="text-2xl font-semibold tabular-nums">{userData.currentCalories}</div>
+                    <div className="text-xs text-[var(--muted-foreground)]">摂取カロリー</div>
+                  </div>
+                  <div className="absolute right-0 top-2 h-12 w-12 rounded-full bg-emerald-500 flex items-center justify-center text-xs font-bold text-white shadow">
+                    P
+                  </div>
+                  <div className="absolute bottom-2 right-2 h-12 w-12 rounded-full bg-amber-500 flex items-center justify-center text-xs font-bold text-white shadow">
+                    F
+                  </div>
+                  <div className="absolute bottom-2 left-2 h-12 w-12 rounded-full bg-sky-500 flex items-center justify-center text-xs font-bold text-white shadow">
+                    C
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        {/* 食事リスト */}
+        <section>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-base font-semibold">今日の食事</h2>
+            <Link
+              href="/meals"
+              className="inline-flex h-8 items-center rounded-md px-3 text-sm font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+            >
+              すべて見る <ChevronRight className="ml-0.5 h-4 w-4" />
+            </Link>
+          </div>
+          <ul className="space-y-2">
+            {userData.meals.map((meal) => (
+              <li key={meal.id}>
+                <Link href={`/meals/${meal.id}`} className="block">
+                  <Card className="overflow-hidden transition-colors hover:bg-[var(--muted)]/50">
+                    <div className="flex">
+                      <div className="h-20 w-20 shrink-0 bg-[var(--muted)]">
+                        {hasMealPhoto(meal.imageUrl) ? (
+                          <img
+                            src={meal.imageUrl!}
+                            alt=""
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <MealImagePlaceholder className="h-full w-full" />
+                        )}
+                      </div>
+                      <div className="flex min-w-0 flex-1 flex-col justify-center px-4 py-3">
+                        <p className="text-xs text-[var(--muted-foreground)]">{meal.time}</p>
+                        <p className="font-medium truncate">{meal.name}</p>
+                        <div className="mt-0.5 flex justify-between gap-2 text-sm text-[var(--muted-foreground)]">
+                          <span>{meal.calories} kcal</span>
+                          <span className="truncate">
+                            P:{meal.protein}g F:{meal.fat}g C:{meal.carbs}g
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+
+      {/* FAB */}
+      <div className="fixed bottom-0 left-0 right-0 flex justify-center bg-[var(--background)]/80 pb-6 pt-4 backdrop-blur-sm">
+        <div className="flex gap-3">
+          <Link href="/add-meal?tab=text">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-12 w-12 rounded-full border-[var(--border)]"
+              aria-label="テキストで記録"
+            >
+              <Edit className="h-5 w-5" />
+            </Button>
+          </Link>
+          <Link href="/add-meal?tab=camera">
+            <Button
+              size="icon"
+              className="h-14 w-14 rounded-full bg-[var(--primary)] shadow-md hover:opacity-90"
+              aria-label="写真で記録"
+            >
+              <Camera className="h-6 w-6" />
+            </Button>
+          </Link>
+          <Link href="/add-meal?tab=manual">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-12 w-12 rounded-full border-[var(--border)]"
+              aria-label="手動で記録"
+            >
+              <Plus className="h-5 w-5" />
+            </Button>
+          </Link>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+      </div>
+    </main>
+  )
 }
