@@ -11,9 +11,14 @@ function hasMealPhoto(url: string | null | undefined): boolean {
   return !!url && !url.includes("placeholder")
 }
 
-export default function MealDetailPage({ params }: { params: { id: string } }) {
+export default async function MealDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
   const meal = {
-    id: params.id,
+    id,
     time: "昼食 - 12:15",
     date: "2024年5月9日",
     name: "鶏むね肉のサラダ",
